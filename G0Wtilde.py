@@ -7,87 +7,6 @@ from General_functions import ExpectationValue, Correlation_potential
 
 
 
-"""
-# (Not needed) residue calculation for poles of fxc
-def Residues(omega, e, Omega_list, omega0):
-
-    Residue_e = [0,0] ; Residue_h = [0,0]
-    e_minus, e_plus = e
-
-    for i,Omega in enumerate(Omega_list):
-
-        ## 1. 1 pole in the upper half complex plane
-        Residue_e[i] += 1 / (omega - e_minus + Omega) * 1 / (omega - e_minus + omega0)
-        Residue_h[i] += 1 / (omega - e_plus - Omega) * 1 / (Omega + omega0)
-        Residue_h[i] += 1 / (omega - e_plus - omega0) * 1 / (Omega + omega0)
-
-        ## 2. 2 poles in the upper half complex plane
-
-        # 2.1 e_minus and Omega
-        f = 1 / (omega - e_minus - Omega)
-        Residue_e[i] += f * (-1 / (omega - e_minus + omega0) + 1 / (Omega + omega0))
-
-        # 2.2 e_minus and omega0
-        f = 1 / (omega - e_minus - omega0)
-        Residue_e[i] += f * (-1 / (omega - e_minus + Omega) + 1 / (Omega + omega0))
-
-        # 2.3 Omega and omega0
-        f = 1 / (Omega - omega0)
-        Residue_h[i] += f * (-1 / (omega - e_plus - Omega) + 1 / (omega - e_plus - omega0))
-
-        ## 3. 3 poles in the upper half complex plane
-        f1 = 1 / (omega - e_minus - Omega)
-        f2 = 1 / (omega - e_minus - omega0)
-        f3 = 1 / (Omega - omega0)
-        Residue_e[i] += f1 * f2 - f1 * f3 + f2 * f3
-
-    return Residue_e, Residue_h
-
-
-
-## Derivative of the residues with respect to omega, needed for the Z factor
-def Residues_derivative(omega, e, Omega_list, omega0):
-
-    dResidue_e = [0,0] ; dResidue_h = [0,0]
-    e_minus, e_plus = e
-
-    for i,Omega in enumerate(Omega_list):
-
-        ## 1. 1 pole in the upper half complex plane
-        dResidue_e[i] += -1 / (omega - e_minus + Omega)**2 * 1 / (omega - e_minus + omega0) + 1 / (omega - e_minus + Omega) * (-1) / (omega - e_minus + omega0)**2
-        dResidue_h[i] += -1 / (omega - e_plus - Omega)**2 * 1 / (Omega + omega0)
-        dResidue_h[i] += -1 / (omega - e_plus - omega0)**2 * 1 / (Omega + omega0)
-
-        ## 2. 2 poles in the upper half complex plane
-
-        # 2.1 e_minus and Omega
-        f = 1 / (omega - e_minus - Omega)
-        df = -1 / (omega - e_minus - Omega)**2
-        dResidue_e[i] += df * (-1 / (omega - e_minus + omega0) + 1 / (Omega + omega0))
-        dResidue_e[i] += f * 1 / (omega - e_minus + omega0)**2
-
-        # 2.2 e_minus and omega0
-        f = 1 / (omega - e_minus - omega0)
-        df = -1 / (omega - e_minus - omega0)**2
-        dResidue_e[i] += df * (-1 / (omega - e_minus + Omega) + 1 / (Omega + omega0))
-        dResidue_e[i] += f * 1 / (omega - e_minus + Omega)**2
-
-        # 2.3 Omega and omega0
-        f = 1 / (Omega - omega0)
-        dResidue_h[i] += f * (1 / (omega - e_plus - Omega)**2 - 1 / (omega - e_plus - omega0)**2)
-
-        ## 3. 3 poles in the upper half complex plane
-        f1 = 1 / (omega - e_minus - Omega) ; df1 = -1 / (omega - e_minus - Omega)**2
-        f2 = 1 / (omega - e_minus - omega0) ; df2 = -1 / (omega - e_minus - omega0)**2
-        f3 = 1 / (Omega - omega0)
-        dResidue_e[i] += df1 * f2 + f1 * df2
-        dResidue_e[i] += -df1 * f3
-        dResidue_e[i] += df2 * f3
-
-    return dResidue_e, dResidue_h
-"""
-
-
 def Z_G0Wtilde(G0, chi_exact, d, U, t):
     e, veff_list, dn = G0 ; gap = e[1] - e[0]
     A_list, Omega_list = chi_exact ; A1, A2 = A_list ; Omega1, Omega2 = Omega_list
@@ -106,9 +25,6 @@ def Z_G0Wtilde(G0, chi_exact, d, U, t):
 
     ## 3. Pole contribution
     prefactor = -U*C3
-    #dResidue_e, dResidue_h = Residues_derivative(e[0], e, Omega_list, omega0)
-    #dSigma_e_dE += prefactor * (A1 * dResidue_e[0] + A2 * dResidue_e[1]) * (dn/2)**2
-    #dSigma_h_dE += prefactor * (A1 * dResidue_h[0] + A2 * dResidue_h[1]) * (1-(dn/2)**2)
 
     def a(Omega):
         return -((Omega+omega0)**2 + Omega**2 + omega0**2)/(Omega**2 * omega0**2 *(Omega+omega0))
