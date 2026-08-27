@@ -4,7 +4,7 @@ from HF import RHF, UHF
 from General_functions import *
 
 
-## In the spin-restricted case, the RPA pole and amplitude have an simple analytical expression
+## In the spin-restricted case, the RPA pole and amplitude have an simple analytical expression in the Hubbard dimer
 def Chi_RPA(veff_list, U, t, eQP=None):
     [veff0, veff1] = veff_list
     dveff = veff1 - veff0 ; D2 = (dveff)**2
@@ -19,7 +19,8 @@ def Chi_RPA(veff_list, U, t, eQP=None):
     return A_RPA, Omega_RPA
 
 
-## In general, the RPA pole and amplitude can be computed from the Casida equation
+## In general, the RPA poles and amplitudes can be computed from the Casida equation
+# The next two functions are not used in this script but can be used to generalize G0W0 to bigger Hubbard models
 def Chi_RPA_Casida(G0, U, t, SpinUnrestricted=False):
     e, veff_list, dn = G0
     if SpinUnrestricted:
@@ -135,10 +136,6 @@ def G0W0_correction_spin_unrestricted(G0, d, U, t):
         vc_list = Correlation_potential(G0_spin, d, U, SpinUnrestricted=True, dn_bar=dn_bar)
         vc_ij = [[vc_list[0], 0], [0, vc_list[1]]] # The correlation potential is diagonal in the site basis
         vc_HOMO = ExpectationValue(G0_spin, 0, vc_ij, t) ; vc_LUMO = ExpectationValue(G0_spin, 1, vc_ij, t)
-        
-        ## The screening is calculated with the total chi (up + down)
-        #eigenvect, [Omega_up, Omega_down] = Chi_RPA_Casida(G0, U, t, SpinUnrestricted=True)
-        #[A_up, A_down] = RPA_amplitudes(eigenvect, G0, t, 0,0, SpinUnrestricted=True)
 
         Z = Z_G0W0_spin_unrestricted(G0_spin, ([A_up, A_down], [Omega_up, Omega_down]), U, spin)
         Sigma_HOMO_e = U**2 * (A_up/Omega_up + A_down/Omega_down) * dn**2
