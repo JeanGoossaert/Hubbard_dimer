@@ -83,18 +83,18 @@ def Z_G0W0(G0, chi_RPA, U):
     e, veff_list, dn = G0
     A_RPA, Omega_RPA = chi_RPA
     gap = e[1] - e[0]
-    dSigma_e_dE = - U**2 * A_RPA/(Omega_RPA**2) * (dn/2)**2
-    dSigma_h_dE = - U**2 * A_RPA/(Omega_RPA + gap)**2 * (1 - (dn/2)**2)
-    dSigma_dE = dSigma_e_dE + dSigma_h_dE
+    dSigma_h_dE = - U**2 * A_RPA/(Omega_RPA**2) * (dn/2)**2
+    dSigma_e_dE = - U**2 * A_RPA/(Omega_RPA + gap)**2 * (1 - (dn/2)**2)
+    dSigma_dE = dSigma_h_dE + dSigma_e_dE
     return 1 / (1 - dSigma_dE)
 
 def Z_G0W0_spin_unrestricted(G0, chi_RPA, U, spin):
     e, veff_list, dn = G0
     [A_up, A_down], [Omega_up, Omega_down] = chi_RPA
     gap = e[1] - e[0]
-    dSigma_e_dE = - U**2 * (A_up/(Omega_up**2) + A_down/(Omega_down**2)) * dn**2
-    dSigma_h_dE = - U**2 * (A_up/(Omega_up + gap)**2 + A_down/(Omega_down + gap)**2) * (1 - dn**2)
-    dSigma_dE = dSigma_e_dE + dSigma_h_dE
+    dSigma_h_dE = - U**2 * (A_up/(Omega_up**2) + A_down/(Omega_down**2)) * dn**2
+    dSigma_e_dE = - U**2 * (A_up/(Omega_up + gap)**2 + A_down/(Omega_down + gap)**2) * (1 - dn**2)
+    dSigma_dE = dSigma_h_dE + dSigma_e_dE
     return 1 / (1 - dSigma_dE)
 
 
@@ -107,10 +107,10 @@ def G0W0_correction(G0, d, U, t):
     A_RPA, Omega_RPA = Chi_RPA(veff_list, U, t)
     Z = Z_G0W0(G0, (A_RPA, Omega_RPA), U)
 
-    Sigma_HOMO_e = U**2 * A_RPA/Omega_RPA * (dn/2)**2
-    Sigma_HOMO_h = U**2 * A_RPA/(Omega_RPA + gap) * ((dn/2)**2 - 1)
+    Sigma_HOMO_h = U**2 * A_RPA/Omega_RPA * (dn/2)**2
+    Sigma_HOMO_e = U**2 * A_RPA/(Omega_RPA + gap) * ((dn/2)**2 - 1)
 
-    Sigma_HOMO = Sigma_HOMO_e + Sigma_HOMO_h
+    Sigma_HOMO = Sigma_HOMO_h + Sigma_HOMO_e
     Sigma_LUMO = -Sigma_HOMO
 
     HOMO = e[0] + Z * (Sigma_HOMO - vc_HOMO)
@@ -138,18 +138,16 @@ def G0W0_correction_spin_unrestricted(G0, d, U, t):
         vc_HOMO = ExpectationValue(G0_spin, 0, vc_ij, t) ; vc_LUMO = ExpectationValue(G0_spin, 1, vc_ij, t)
 
         Z = Z_G0W0_spin_unrestricted(G0_spin, ([A_up, A_down], [Omega_up, Omega_down]), U, spin)
-        Sigma_HOMO_e = U**2 * (A_up/Omega_up + A_down/Omega_down) * dn**2
-        Sigma_HOMO_h = U**2 * (A_up/(Omega_up + gap) + A_down/(Omega_down + gap)) * (dn**2 - 1)
+        Sigma_HOMO_h = U**2 * (A_up/Omega_up + A_down/Omega_down) * dn**2
+        Sigma_HOMO_e = U**2 * (A_up/(Omega_up + gap) + A_down/(Omega_down + gap)) * (dn**2 - 1)
 
-        Sigma_HOMO = Sigma_HOMO_e + Sigma_HOMO_h
+        Sigma_HOMO = Sigma_HOMO_h + Sigma_HOMO_e
         Sigma_LUMO = -Sigma_HOMO
 
         HOMO = e[0] + Z * (Sigma_HOMO - vc_HOMO) ; HOMOs.append(HOMO)
         LUMO = e[1] + Z * (Sigma_LUMO - vc_LUMO) ; LUMOs.append(LUMO)
 
     return HOMOs[0], LUMOs[0]
-
-
 
 
 def G0W0_QP(d, U, t, StartingPoint='KS', ExactKSHomo=True):
