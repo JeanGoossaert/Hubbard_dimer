@@ -6,7 +6,6 @@ from HF import RHF, UHF
 from General_functions import ExpectationValue, Correlation_potential
 
 
-
 def Z_G0Wtilde(G0, chi_exact, d, U, t):
     e, veff_list, dn = G0 ; gap = e[1] - e[0]
     A_list, Omega_list = chi_exact ; A1, A2 = A_list ; Omega1, Omega2 = Omega_list
@@ -15,13 +14,13 @@ def Z_G0Wtilde(G0, chi_exact, d, U, t):
     # HOMO and LUMO have the same Z
 
     ## 1. G0W + static contribution
-    dSigma_e_dE = -U*(U + C1) * (A1/(Omega1**2) + A2/(Omega2**2)) * (dn/2)**2
-    dSigma_h_dE = -U*(U + C1) * (A1/(Omega1 + gap)**2 + A2/(Omega2 + gap)**2) * (1 - (dn/2)**2)
+    dSigma_h_dE = -U*(U + C1) * (A1/(Omega1**2) + A2/(Omega2**2)) * (dn/2)**2
+    dSigma_e_dE = -U*(U + C1) * (A1/(Omega1 + gap)**2 + A2/(Omega2 + gap)**2) * (1 - (dn/2)**2)
 
     ## 2. Quadratic contribution
     # Static correction to Sigma_x does not contribute to Z
-    dSigma_e_dE += -U*C2 * (A1 + A2) * (dn/2)**2
-    dSigma_h_dE += -U*C2 * (A1*Omega1**2/(Omega1 + gap)**2 + A2*Omega2**2/(Omega2 + gap)**2) * (1 - (dn/2)**2)
+    dSigma_h_dE += -U*C2 * (A1 + A2) * (dn/2)**2
+    dSigma_e_dE += -U*C2 * (A1*Omega1**2/(Omega1 + gap)**2 + A2*Omega2**2/(Omega2 + gap)**2) * (1 - (dn/2)**2)
 
     ## 3. Pole contribution
     prefactor = -U*C3
@@ -33,10 +32,10 @@ def Z_G0Wtilde(G0, chi_exact, d, U, t):
         denominator = (gap+Omega)**2 *(gap+omega0)**2 *(Omega+omega0)*(Omega-omega0)
         return num/denominator
 
-    dSigma_e_dE += prefactor * (A1 * a(Omega1) + A2 * a(Omega2)) * (dn/2)**2
-    dSigma_h_dE += prefactor * (A1 * b(Omega1) + A2 * b(Omega2)) * (1-(dn/2)**2)
+    dSigma_h_dE += prefactor * (A1 * a(Omega1) + A2 * a(Omega2)) * (dn/2)**2
+    dSigma_e_dE += prefactor * (A1 * b(Omega1) + A2 * b(Omega2)) * (1-(dn/2)**2)
 
-    dSigma_dE = dSigma_e_dE + dSigma_h_dE
+    dSigma_dE = dSigma_h_dE + dSigma_e_dE
     return 1 / (1 - dSigma_dE)
 
 
@@ -53,31 +52,31 @@ def G0Wtilde_correction(G0, d, U, t):
     A1, A2 = A_list ; Omega1, Omega2 = Omega_list
 
     ## 1. G0W + static contribution
-    Sigma_HOMO_e = U*(U + C1) * (A1/Omega1 + A2/Omega2) * (dn/2)**2
-    Sigma_HOMO_h = U*(U + C1) * (A1/(Omega1 + gap) + A2/(Omega2 + gap)) * ((dn/2)**2 - 1)
+    Sigma_HOMO_h = U*(U + C1) * (A1/Omega1 + A2/Omega2) * (dn/2)**2
+    Sigma_HOMO_e = U*(U + C1) * (A1/(Omega1 + gap) + A2/(Omega2 + gap)) * ((dn/2)**2 - 1)
 
     ## 2. Quadratic contribution
     # 2.1 static correction to Sigma_x
     prefactor = -U*C2 * (A1*Omega1 + A2*Omega2)
     n1 = (2 + dn) / 2 ; n2 = (2 - dn) / 2 ; n_ij = [[n1, 0], [0, n2]]
-    Sigma_x_HOMO = ExpectationValue(G0, 0, n_ij, t) * prefactor
-    Sigma_x_LUMO = ExpectationValue(G0, 1, n_ij, t) * prefactor
+    dSigma_x_HOMO = ExpectationValue(G0, 0, n_ij, t) * prefactor
+    dSigma_x_LUMO = ExpectationValue(G0, 1, n_ij, t) * prefactor
 
     # 2.2 correction to Sigma_c
-    Sigma_HOMO_e += U*C2 * (A1*Omega1 + A2*Omega2) * (dn/2)**2
-    Sigma_HOMO_h += U*C2 * (A1*Omega1**2/(Omega1 + gap) + A2*Omega2**2/(Omega2 + gap)) * ((dn/2)**2 - 1)
+    Sigma_HOMO_h += U*C2 * (A1*Omega1 + A2*Omega2) * (dn/2)**2
+    Sigma_HOMO_e += U*C2 * (A1*Omega1**2/(Omega1 + gap) + A2*Omega2**2/(Omega2 + gap)) * ((dn/2)**2 - 1)
 
     ## 3. Pole contribution
     prefactor = -U*C3
 
-    Sigma_HOMO_e += prefactor * 2*(A1/(Omega1*omega0)+A2/(Omega2*omega0)) * (dn/2)**2
-    Sigma_HOMO_h += prefactor * (-2)*(A1*(gap+Omega1+omega0)/((gap+Omega1)*(gap+omega0)*(Omega1+omega0))
+    Sigma_HOMO_h += prefactor * 2*(A1/(Omega1*omega0)+A2/(Omega2*omega0)) * (dn/2)**2
+    Sigma_HOMO_e += prefactor * (-2)*(A1*(gap+Omega1+omega0)/((gap+Omega1)*(gap+omega0)*(Omega1+omega0))
                                       +A2*(gap+Omega2+omega0)/((gap+Omega2)*(gap+omega0)*(Omega2+omega0))) * (1-(dn/2)**2)
     Sigma_LUMO_h = -Sigma_HOMO_e
     Sigma_LUMO_e = -Sigma_HOMO_h
 
-    Sigma_HOMO = Sigma_HOMO_e + Sigma_HOMO_h + Sigma_x_HOMO
-    Sigma_LUMO = Sigma_LUMO_e + Sigma_LUMO_h + Sigma_x_LUMO
+    Sigma_HOMO = Sigma_HOMO_h + Sigma_HOMO_e + dSigma_x_HOMO
+    Sigma_LUMO = Sigma_LUMO_h + Sigma_LUMO_e + dSigma_x_LUMO
 
     HOMO = e[0] + Z * (Sigma_HOMO - vc_HOMO)
     LUMO = e[1] + Z * (Sigma_LUMO - vc_LUMO)
